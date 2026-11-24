@@ -30,3 +30,4 @@ def find_maximum(values):
 
 def devtrack_test():
     return "Dynamic risk test"
+    print("DevTrack dynamic metrics test")
