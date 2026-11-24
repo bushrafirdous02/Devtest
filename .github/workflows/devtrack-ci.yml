@@ -59,7 +59,7 @@ jobs:
         env:
           DEVTRACK_CI_TOKEN: ${{ secrets.DEVTRACK_CI_TOKEN }}
         run: |
-          curl -X POST "https://headboard-strainer-hydrogen.ngrok-free.dev/api/risk/ci" \
+          curl --fail-with-body -X POST "https://headboard-strainer-hydrogen.ngrok-free.dev/api/risk/ci" \
             -H "Content-Type: application/json" \
             -H "X-DevTrack-Token: $DEVTRACK_CI_TOKEN" \
             -d "{
