@@ -38,5 +38,25 @@ jobs:
             echo "No tests directory found. Skipping tests."
           fi
 
+              - name: Send results to DevTrack
+        if: success()
+        env:
+          DEVTRACK_CI_TOKEN: ${{ secrets.DEVTRACK_CI_TOKEN }}
+        run: |
+          curl -X POST "https://headboard-strainer-hydrogen.ngrok-free.dev/api/risk/ci" \
+            -H "Content-Type: application/json" \
+            -H "X-DevTrack-Token: $DEVTRACK_CI_TOKEN" \
+            -d '{
+              "project_id": 4,
+              "files_changed": 1,
+              "lines_added": 29,
+              "lines_deleted": 0,
+              "tests_passed": true,
+              "vulnerabilities": 0,
+              "dependency_changes": 0,
+              "previous_failures": 0
+            }'
+
       - name: CI completed
         run: echo "DevTrack CI pipeline completed successfully."
+
