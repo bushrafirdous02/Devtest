@@ -38,6 +38,21 @@ jobs:
             echo "No tests directory found. Skipping tests."
           fi
 
+      - name: Calculate change metrics
+        id: changes
+        run: |
+          FILES_CHANGED=$(git diff --name-only HEAD^ HEAD | wc -l)
+          LINES_ADDED=$(git diff --numstat HEAD^ HEAD | awk '{sum += $1} END {print sum+0}')
+          LINES_DELETED=$(git diff --numstat HEAD^ HEAD | awk '{sum += $2} END {print sum+0}')
+
+          echo "Files changed: $FILES_CHANGED"
+          echo "Lines added: $LINES_ADDED"
+          echo "Lines deleted: $LINES_DELETED"
+
+          echo "FILES_CHANGED=$FILES_CHANGED" >> $GITHUB_ENV
+          echo "LINES_ADDED=$LINES_ADDED" >> $GITHUB_ENV
+          echo "LINES_DELETED=$LINES_DELETED" >> $GITHUB_ENV
+
       - name: Send results to DevTrack
         if: success()
         env:
@@ -46,17 +61,16 @@ jobs:
           curl -X POST "https://headboard-strainer-hydrogen.ngrok-free.dev/api/risk/ci" \
             -H "Content-Type: application/json" \
             -H "X-DevTrack-Token: $DEVTRACK_CI_TOKEN" \
-            -d '{
-              "project_id": 4,
-              "files_changed": 1,
-              "lines_added": 29,
-              "lines_deleted": 0,
-              "tests_passed": true,
-              "vulnerabilities": 0,
-              "dependency_changes": 0,
-              "previous_failures": 0
-            }'
+            -d "{
+              \"project_id\": 4,
+              \"files_changed\": $FILES_CHANGED,
+              \"lines_added\": $LINES_ADDED,
+              \"lines_deleted\": $LINES_DELETED,
+              \"tests_passed\": true,
+              \"vulnerabilities\": 0,
+              \"dependency_changes\": 0,
+              \"previous_failures\": 0
+            }"
 
       - name: CI completed
         run: echo "DevTrack CI pipeline completed successfully."
-
