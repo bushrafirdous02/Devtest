@@ -27,3 +27,6 @@ def find_maximum(values):
             maximum = value
 
     return maximum
+
+def devtrack_test():
+    return "Dynamic risk test"
